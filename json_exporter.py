@@ -4,6 +4,7 @@ import requests
 import sys
 import time
 
+import settings
 from utils import YarnUtils
 
 
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     print(sys.argv)
     start_http_server(int(sys.argv[1]))
     targets = list()
-    for (app_name, url) in YarnUtils.get_YARN_apps('*h5.*'):
+    for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
         targets.append(Target('spark_streaming', app_name, url))
     # targets.append(Target('flume', 'haijun_flume_test1', 'http://10.2.19.94:34545/metrics'))
     # targets.append(Target('spark_streaming', 'h5_streaming_test1',
