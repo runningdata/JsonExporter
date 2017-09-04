@@ -7,6 +7,8 @@ import time
 import settings
 from utils import YarnUtils
 
+running_cache = dict()
+
 
 class JsonCollector():
     def init(self, endpoint, appname, srvtype, separator='__'):
@@ -14,6 +16,9 @@ class JsonCollector():
         self._appname = appname
         self._separator = separator
         self._srvtype = srvtype
+
+    def __eq__(self, other):
+        return self._appname == other._appname and self._srvtype == other._srvtype
 
     def __init__(self, target):
         self.init(target.url, target.appname, target.srvtype)
@@ -51,11 +56,17 @@ class JsonCollector():
                 self.handle_type(prefix + self._separator + dd.index(i), i, metric)
 
     def collect(self):
+        metric = Metric(self._srvtype, 'spark program id', 'summary')
         try:
-            response = json.loads(requests.get(self._endpoint).content.decode('UTF-8'))
-            metric = Metric(self._srvtype, 'spark program id', 'summary')
+            resp = requests.get(self._endpoint)
+            while len(resp.history) > 0:
+                for (new_app_name, new_url) in YarnUtils.get_YARN_apps(self._appname):
+                    self._endpoint = new_url
+
+                resp = requests.get(self._endpoint)
+
+            response = json.loads(resp.content.decode('UTF-8'))
             self.handle_type('', response, metric)
-            yield metric
 
         # output = []
         #            output.append('# HELP {0} {1}'.format(
@@ -72,7 +83,10 @@ class JsonCollector():
         #                output.append('{0}{1} {2}\n'.format(name, labelstr, pcore._floatToGoString(value)))
         #            print('\n'.join(output))
         except Exception, e:
-            print e.message
+            print('error happens for %s , %s ' % (self._appname, e.message))
+            metric.add_sample('scrape_error',
+                              value=1, labels={'app_name': self._appname})
+        yield metric
 
 
 class Target():
@@ -87,14 +101,29 @@ if __name__ == '__main__':
 
     print(sys.argv)
     start_http_server(int(sys.argv[1]))
-    targets = list()
-    for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
-        targets.append(Target('spark_streaming', app_name, url))
-    # targets.append(Target('flume', 'haijun_flume_test1', 'http://10.2.19.94:34545/metrics'))
-    # targets.append(Target('spark_streaming', 'h5_streaming_test1',
-    #                       'http://datanode02.yinker.com:8088/proxy/application_1503367795164_17593/metrics/json'))
-    for target in targets:
-        REGISTRY.register(JsonCollector(target))
-    # REGISTRY.register(JsonCollector())
+    # collectors = list()
+    # for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+    #     tmp_collector = JsonCollector(Target('spark_streaming', app_name, url))
+    #     collectors.append(tmp_collector)
+    #     running_cache['app_name'] = tmp_collector
+    # # targets.append(Target('flume', 'haijun_flume_test1', 'http://10.2.19.94:34545/metrics'))
+    # # targets.append(Target('spark_streaming', 'h5_streaming_test1',
+    # #                       'http://datanode02.yinker.com:8088/proxy/application_1503367795164_17593/metrics/json'))
+    # for col in collectors:
+    #     REGISTRY.register(col)
 
-    while True: time.sleep(10)
+    while True:
+        tmps = set()
+        for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+            tmp_collector = JsonCollector(Target('spark_streaming', app_name, url))
+            if app_name not in running_cache:
+                running_cache[app_name] = tmp_collector
+                REGISTRY.register(tmp_collector)
+                tmps.add(app_name)
+
+        for app_name in running_cache.keys():
+            if not any(app_name1 == app_name for app_name1 in tmps):
+                print('Going to remove %s registry' % app_name)
+                REGISTRY.unregister(running_cache[app_name])
+
+        time.sleep(30)
