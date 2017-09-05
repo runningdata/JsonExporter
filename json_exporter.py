@@ -101,7 +101,21 @@ class Target():
 
 if __name__ == '__main__':
     # Usage: json_exporter.py port endpoint
-
+    # tmp_1 = JsonCollector(Target('spark_streaming', 'xx', 'yy'))
+    # running_cache['xx'] = tmp_1
+    # tmps = set()
+    # if 'xx' not in running_cache:
+    #     tt = JsonCollector(Target('spark_streaming', 'xx', 'yy'))
+    #     running_cache['xx'] = tt
+    #     tmps.add('xx')
+    # else:
+    #     print('IN here')
+    #
+    # print(tmps)
+    #
+    # for app_name in running_cache.keys():
+    #     if not any(app_name1 == app_name for app_name1 in tmps):
+    #         print('Going to remove %s registry' % app_name)
     print(sys.argv)
     start_http_server(int(sys.argv[1]))
     # collectors = list()
@@ -118,11 +132,11 @@ if __name__ == '__main__':
     while True:
         tmps = set()
         for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+            tmps.add(app_name)
             tmp_collector = JsonCollector(Target('spark_streaming', app_name, url))
             if app_name not in running_cache:
                 running_cache[app_name] = tmp_collector
                 REGISTRY.register(tmp_collector)
-                tmps.add(app_name)
 
         for app_name in running_cache.keys():
             if not any(app_name1 == app_name for app_name1 in tmps):
