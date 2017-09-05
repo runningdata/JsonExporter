@@ -1,3 +1,4 @@
+import re
 from prometheus_client import core as pcore, start_http_server, Metric, REGISTRY
 import json
 import requests
@@ -131,9 +132,12 @@ if __name__ == '__main__':
 
     while True:
         tmps = set()
-        for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+        for (app_name, url) in YarnUtils.get_YARN_apps():
             tmps.add(app_name)
-            tmp_collector = JsonCollector(Target('spark_streaming', app_name, url))
+            matchObj = re.match(settings.APP_PATTERN, app_name)
+            if matchObj:
+                postfix = matchObj.group()
+            tmp_collector = JsonCollector(Target('spark_streaming_' + postfix, app_name, url))
             if app_name not in running_cache:
                 running_cache[app_name] = tmp_collector
                 REGISTRY.register(tmp_collector)
