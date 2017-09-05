@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     while True:
         tmps = set()
-        for (app_name, url) in YarnUtils.get_YARN_apps():
+        for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
             tmps.add(app_name)
             matchObj = re.match(settings.APP_PATTERN, app_name)
             if matchObj:
