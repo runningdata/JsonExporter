@@ -146,5 +146,6 @@ if __name__ == '__main__':
             if not any(app_name1 == app_name for app_name1 in tmps):
                 print('Going to remove %s registry' % app_name)
                 REGISTRY.unregister(running_cache[app_name])
+                running_cache.pop(app_name, 'x')
 
         time.sleep(30)
