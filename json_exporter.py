@@ -136,7 +136,7 @@ if __name__ == '__main__':
             tmps.add(app_name)
             matchObj = re.match(settings.APP_PATTERN, app_name)
             if matchObj:
-                postfix = matchObj.group()
+                postfix = matchObj.group(0)
             tmp_collector = JsonCollector(Target('spark_streaming_' + postfix, app_name, url))
             if app_name not in running_cache:
                 running_cache[app_name] = tmp_collector
