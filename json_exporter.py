@@ -21,8 +21,8 @@ class JsonCollector():
         return self._appname == other._appname and self._srvtype == other._srvtype
 
     def __hash__(self):
-        return hash(tuple(self))
-    
+        return id(self)
+
     def __init__(self, target):
         self.init(target.url, target.appname, target.srvtype)
 
