@@ -34,7 +34,8 @@ dbutil = DBUtil()
 def get_spark_apps():
     print(' going to check db queue.. ')
     app_names = set()
-    cursor = dbutil.get_connection().cursor()
+    db = MySQLdb.connect(settings.DB_HOST, settings.DB_USER, settings.DB_PASSWD, settings.DB_NAME)
+    cursor = db.cursor()
 
     try:
         print(app_names)
