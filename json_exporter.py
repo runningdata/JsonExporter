@@ -73,6 +73,8 @@ class JsonCollector():
 
             response = json.loads(resp.content.decode('UTF-8'))
             self.handle_type('', response, metric)
+            metric.add_sample('spark_up',
+                              value=1, labels={'app_name': self._appname})
 
         # output = []
         #            output.append('# HELP {0} {1}'.format(
