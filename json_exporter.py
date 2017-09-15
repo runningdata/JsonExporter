@@ -44,7 +44,8 @@ class JsonCollector():
                     metric.add_sample('json_val',
                                       value=val, labels={'app_name': self._appname, 'rowkey': prefix})
                 except ValueError:
-                    print('Error convert %s to float for %s' % (d, prefix))
+                    pass
+                    # print('Error convert %s to float for %s' % (d, prefix))
 
     def extract_dict(self, prefix, dd, metric):
         for k, v in dd.items():
