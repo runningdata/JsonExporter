@@ -37,6 +37,7 @@ def get_spark_apps():
     cursor = dbutil.get_connection().cursor()
 
     try:
+        print(app_names)
         cursor.execute('select instance_name from running_alert_sparkmonitorinstance where valid = 1')
         results = cursor.fetchall()
         for row in results:
