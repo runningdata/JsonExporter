@@ -135,7 +135,10 @@ if __name__ == '__main__':
     while True:
         tmps = set()
         # for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+        print('go to get apps from db')
         app_names = DBUtils.get_spark_apps()
+
+        print('go to get apps from yarn')
         for (app_name, url) in YarnUtils.get_target_apps(app_names=app_names):
             tmps.add(app_name)
             # matchObj = re.match(settings.APP_PATTERN, app_name)
@@ -155,5 +158,5 @@ if __name__ == '__main__':
                 REGISTRY.unregister(running_cache[app_name])
                 running_cache.pop(app_name, 'x')
                 print('removed collector for %s' % app_name)
-
+        print 'end'
         time.sleep(30)
