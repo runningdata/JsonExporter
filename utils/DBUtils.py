@@ -40,6 +40,7 @@ def get_spark_apps():
         results = cursor.fetchall()
         for row in results:
             app_names.add(row[0])
+        print(app_names)
     except Exception, e:
         print "Error: unable to fecth data: %s " % e
         raise e

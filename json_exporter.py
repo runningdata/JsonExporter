@@ -144,12 +144,15 @@ if __name__ == '__main__':
             tmp_collector = JsonCollector(Target('spark_streaming_' + app_name, app_name, url))
             if app_name not in running_cache:
                 running_cache[app_name] = tmp_collector
+                print('Going to add %s collector' % app_name)
                 REGISTRY.register(tmp_collector)
+                print('added collector for %s' % app_name)
 
         for app_name in running_cache.keys():
             if not any(app_name1 == app_name for app_name1 in tmps):
-                print('Going to remove %s registry' % app_name)
+                print('Going to remove %s collector' % app_name)
                 REGISTRY.unregister(running_cache[app_name])
                 running_cache.pop(app_name, 'x')
+                print('removed collector for %s' % app_name)
 
         time.sleep(30)
