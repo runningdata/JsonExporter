@@ -131,8 +131,8 @@ if __name__ == '__main__':
     # #                       'http://datanode02.yinker.com:8088/proxy/application_1503367795164_17593/metrics/json'))
     # for col in collectors:
     #     REGISTRY.register(col)
-    print('where is the output? ')
     while True:
+        print('start at %s ' % time.strftime("%Y%m%d%H%M%S"))
         tmps = set()
         # for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
         print('go to get apps from db')
@@ -158,5 +158,5 @@ if __name__ == '__main__':
                 REGISTRY.unregister(running_cache[app_name])
                 running_cache.pop(app_name, 'x')
                 print('removed collector for %s' % app_name)
-        print 'end'
+        print 'end ----------------------------\n'
         time.sleep(30)
