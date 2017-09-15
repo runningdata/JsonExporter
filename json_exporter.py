@@ -6,6 +6,7 @@ import sys
 import time
 
 import settings
+from utils import DBUtils
 from utils import YarnUtils
 
 running_cache = dict()
@@ -132,12 +133,15 @@ if __name__ == '__main__':
 
     while True:
         tmps = set()
-        for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+        # for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
+        app_names = DBUtils.get_spark_apps()
+        for (app_name, url) in YarnUtils.get_target_apps(app_names=app_names):
             tmps.add(app_name)
-            matchObj = re.match(settings.APP_PATTERN, app_name)
-            if matchObj:
-                postfix = matchObj.group(1)
-            tmp_collector = JsonCollector(Target('spark_streaming_' + postfix, app_name, url))
+            # matchObj = re.match(settings.APP_PATTERN, app_name)
+            # if matchObj:
+            #     postfix = matchObj.group(1)
+            # tmp_collector = JsonCollector(Target('spark_streaming_' + postfix, app_name, url))
+            tmp_collector = JsonCollector(Target('spark_streaming_' + app_name, app_name, url))
             if app_name not in running_cache:
                 running_cache[app_name] = tmp_collector
                 REGISTRY.register(tmp_collector)
