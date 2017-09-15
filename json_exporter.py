@@ -131,7 +131,7 @@ if __name__ == '__main__':
     # #                       'http://datanode02.yinker.com:8088/proxy/application_1503367795164_17593/metrics/json'))
     # for col in collectors:
     #     REGISTRY.register(col)
-
+    print('where is the output? ')
     while True:
         tmps = set()
         # for (app_name, url) in YarnUtils.get_YARN_apps(settings.APP_PATTERN):
