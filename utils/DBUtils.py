@@ -32,6 +32,7 @@ dbutil = DBUtil()
 
 
 def get_spark_apps():
+    print(' going to check db queue.. ')
     app_names = set()
     cursor = dbutil.get_connection().cursor()
 
